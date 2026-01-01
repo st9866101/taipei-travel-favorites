@@ -36,6 +36,32 @@ body {
     display: inline-block;
     padding-bottom: 10px;
   }
+
+  .nav-links {
+    margin-top: $spacing-unit;
+
+    button {
+      background: none;
+      border: 2px solid transparent;
+      margin: 0 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: $text-color;
+      padding: 5px 15px;
+      border-radius: 20px;
+      transition: all 0.2s;
+
+      &:hover {
+        color: $primary-color;
+        background-color: lighten($primary-color, 60%);
+      }
+
+      &.active {
+        color: white;
+        background-color: $primary-color;
+      }
+    }
+  }
 }
 
 .category-filter {
