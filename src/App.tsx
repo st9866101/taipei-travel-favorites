@@ -17,21 +17,22 @@ function App() {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
-  const [favorites, setFavorites] = useState<number[]>([]);
 
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem('taipei_travel_favorites');
-    if (savedFavorites) {
-      try {
-        setFavorites(JSON.parse(savedFavorites));
-      } catch (e) {
-        console.error('Failed to parse favorites', e);
-      }
+  const STORAGE_KEY = 'taipei_travel_favorites';
+
+  const [favorites, setFavorites] = useState<number[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
     }
-  }, []);
-
+  });
   useEffect(() => {
-    localStorage.setItem('taipei_travel_favorites', JSON.stringify(favorites));
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(favorites)
+    );
   }, [favorites]);
 
   const toggleFavorite = (id: number) => {
@@ -41,7 +42,7 @@ function App() {
       } else {
         return [...prev, id];
       }
-    });
+    })
   };
 
   const PAGE_SIZE = 10;
@@ -55,7 +56,7 @@ function App() {
       if (attractionsData && Array.isArray(attractionsData.data)) {
         const allData = attractionsData.data as any as Attraction[];
 
-        const uniqueCategories = new Map();
+        const uniqueCategories = new Map<number, string>();
         allData.forEach(item => {
           if (item.category && Array.isArray(item.category)) {
             item.category.forEach(cat => {
