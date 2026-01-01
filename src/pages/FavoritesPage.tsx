@@ -12,15 +12,17 @@ interface Props {
     onToggleFavorite: (id: number) => void;
     editedAttractions: Record<number, Attraction>;
     onSaveAttraction: (updated: Attraction) => void;
+    onRemoveFavorites: (ids: number[]) => void;
 }
 
 const PAGE_SIZE = 10;
 
-const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAttractions, onSaveAttraction }) => {
+const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAttractions, onSaveAttraction, onRemoveFavorites }) => {
     const { attractions, loading, error, categories } = useAttractions(editedAttractions);
     const [page, setPage] = useState(1);
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [editingAttraction, setEditingAttraction] = useState<Attraction | null>(null);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const handleEditClick = (attraction: Attraction) => {
         setEditingAttraction(attraction);
@@ -28,6 +30,23 @@ const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAtt
 
     const handleSave = (updated: Attraction) => {
         onSaveAttraction(updated);
+    };
+
+    const handleSelect = (id: number, selected: boolean) => {
+        setSelectedIds(prev => {
+            if (selected) {
+                return [...prev, id];
+            } else {
+                return prev.filter(sid => sid !== id);
+            }
+        });
+    };
+
+    const handleBulkRemove = () => {
+        if (selectedIds.length > 0) {
+            onRemoveFavorites(selectedIds);
+            setSelectedIds([]);
+        }
     };
 
     const filteredData = useMemo(() => {
@@ -73,6 +92,16 @@ const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAtt
                 </div>
             ) : (
                 <>
+                    <div className="bulk-actions" style={{ marginBottom: '16px', textAlign: 'right' }}>
+                        <button
+                            className="btn-remove-selected"
+                            disabled={selectedIds.length === 0}
+                            onClick={handleBulkRemove}
+                        >
+                            移除選取項目 ({selectedIds.length}) (Remove Selected)
+                        </button>
+                    </div>
+
                     <div className="attraction-list">
                         {currentData.map(item => (
                             <AttractionCard
@@ -81,6 +110,9 @@ const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAtt
                                 isFavorite={favorites.includes(item.id)}
                                 onToggleFavorite={onToggleFavorite}
                                 onEdit={() => handleEditClick(item)}
+                                selectable={true}
+                                isSelected={selectedIds.includes(item.id)}
+                                onSelect={handleSelect}
                             />
                         ))}
                     </div>

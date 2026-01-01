@@ -52,6 +52,17 @@ function App() {
     }));
   };
 
+  const removeFavorites = (ids: number[]) => {
+    setFavorites(prev => prev.filter(id => !ids.includes(id)));
+    setEditedAttractions(prev => {
+      const next = { ...prev };
+      ids.forEach(id => {
+        delete next[id];
+      });
+      return next;
+    });
+  };
+
   return (
     <BrowserRouter>
       <div className="container">
@@ -93,6 +104,7 @@ function App() {
                 onToggleFavorite={toggleFavorite}
                 editedAttractions={editedAttractions}
                 onSaveAttraction={handleSaveAttraction}
+                onRemoveFavorites={removeFavorites}
               />
             }
           />

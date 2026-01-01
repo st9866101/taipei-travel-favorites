@@ -6,9 +6,20 @@ interface Props {
     isFavorite: boolean;
     onToggleFavorite: (id: number) => void;
     onEdit?: () => void;
+    selectable?: boolean;
+    isSelected?: boolean;
+    onSelect?: (id: number, selected: boolean) => void;
 }
 
-const AttractionCard: React.FC<Props> = ({ data, isFavorite, onToggleFavorite, onEdit }) => {
+const AttractionCard: React.FC<Props> = ({
+    data,
+    isFavorite,
+    onToggleFavorite,
+    onEdit,
+    selectable,
+    isSelected,
+    onSelect
+}) => {
     const imageUrl = data.images && data.images.length > 0
         ? data.images[0].src
         : 'https://via.placeholder.com/400x300?text=No+Image';
@@ -20,7 +31,17 @@ const AttractionCard: React.FC<Props> = ({ data, isFavorite, onToggleFavorite, o
             </div>
             <div className="card-content">
                 <div className="card-header d-flex justify-content-between">
-                    <h2>{data.name}</h2>
+                    <div className="d-flex align-items-center">
+                        {selectable && (
+                            <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => onSelect && onSelect(data.id, e.target.checked)}
+                                className="card-checkbox"
+                            />
+                        )}
+                        <h2>{data.name}</h2>
+                    </div>
                     <div>
                         {onEdit && (
                             <button
