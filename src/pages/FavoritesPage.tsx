@@ -1,20 +1,34 @@
 import { useState, useMemo } from 'react';
 import { useAttractions } from '../hooks/useAttractions';
+import type { Attraction } from '../types';
 import AttractionCard from '../components/AttractionCard';
 import Pagination from '../components/Pagination';
 import CategoryFilter from '../components/CategoryFilter';
 
+import EditAttractionModal from '../components/EditAttractionModal';
+
 interface Props {
     favorites: number[];
     onToggleFavorite: (id: number) => void;
+    editedAttractions: Record<number, Attraction>;
+    onSaveAttraction: (updated: Attraction) => void;
 }
 
 const PAGE_SIZE = 10;
 
-const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite }) => {
-    const { attractions, loading, error, categories } = useAttractions();
+const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAttractions, onSaveAttraction }) => {
+    const { attractions, loading, error, categories } = useAttractions(editedAttractions);
     const [page, setPage] = useState(1);
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [editingAttraction, setEditingAttraction] = useState<Attraction | null>(null);
+
+    const handleEditClick = (attraction: Attraction) => {
+        setEditingAttraction(attraction);
+    };
+
+    const handleSave = (updated: Attraction) => {
+        onSaveAttraction(updated);
+    };
 
     const filteredData = useMemo(() => {
         // First filter by favorites
@@ -66,6 +80,7 @@ const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite }) => {
                                 data={item}
                                 isFavorite={favorites.includes(item.id)}
                                 onToggleFavorite={onToggleFavorite}
+                                onEdit={() => handleEditClick(item)}
                             />
                         ))}
                     </div>
@@ -75,6 +90,15 @@ const FavoritesPage: React.FC<Props> = ({ favorites, onToggleFavorite }) => {
                         totalPages={totalPages}
                         onPageChange={setPage}
                     />
+
+                    {editingAttraction && (
+                        <EditAttractionModal
+                            attraction={editingAttraction}
+                            isOpen={!!editingAttraction}
+                            onClose={() => setEditingAttraction(null)}
+                            onSave={handleSave}
+                        />
+                    )}
                 </>
             )}
         </div>

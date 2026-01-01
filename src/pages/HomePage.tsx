@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAttractions } from '../hooks/useAttractions';
+import type { Attraction } from '../types'; // Add import
 import AttractionCard from '../components/AttractionCard';
 import Pagination from '../components/Pagination';
 import CategoryFilter from '../components/CategoryFilter';
@@ -7,12 +8,13 @@ import CategoryFilter from '../components/CategoryFilter';
 interface Props {
     favorites: number[];
     onToggleFavorite: (id: number) => void;
+    editedAttractions: Record<number, Attraction>;
 }
 
 const PAGE_SIZE = 10;
 
-const HomePage: React.FC<Props> = ({ favorites, onToggleFavorite }) => {
-    const { attractions, loading, error, categories } = useAttractions();
+const HomePage: React.FC<Props> = ({ favorites, onToggleFavorite, editedAttractions }) => {
+    const { attractions, loading, error, categories } = useAttractions(editedAttractions);
     const [page, setPage] = useState(1);
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import type { Attraction } from './types'; // Add import
 import HomePage from './pages/HomePage';
 import FavoritesPage from './pages/FavoritesPage';
 import './styles/main.scss';
@@ -16,9 +17,23 @@ function App() {
     }
   });
 
+  const EDITS_STORAGE_KEY = 'taipei_travel_edits';
+  const [editedAttractions, setEditedAttractions] = useState<Record<number, Attraction>>(() => {
+    try {
+      const saved = localStorage.getItem(EDITS_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
   }, [favorites]);
+
+  useEffect(() => {
+    localStorage.setItem(EDITS_STORAGE_KEY, JSON.stringify(editedAttractions));
+  }, [editedAttractions]);
 
   const toggleFavorite = (id: number) => {
     setFavorites(prev => {
@@ -28,6 +43,13 @@ function App() {
         return [...prev, id];
       }
     });
+  };
+
+  const handleSaveAttraction = (updated: Attraction) => {
+    setEditedAttractions(prev => ({
+      ...prev,
+      [updated.id]: updated
+    }));
   };
 
   return (
@@ -59,6 +81,7 @@ function App() {
               <HomePage
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
+                editedAttractions={editedAttractions}
               />
             }
           />
@@ -68,6 +91,8 @@ function App() {
               <FavoritesPage
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
+                editedAttractions={editedAttractions}
+                onSaveAttraction={handleSaveAttraction}
               />
             }
           />

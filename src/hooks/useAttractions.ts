@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { Attraction } from '../types';
 import attractionsData from '../data/AttractionsAll.json';
 
-export const useAttractions = () => {
+export const useAttractions = (overrides: Record<number, Attraction> = {}) => {
     const [attractions, setAttractions] = useState<Attraction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -12,7 +12,13 @@ export const useAttractions = () => {
         setLoading(true);
         try {
             if (attractionsData && Array.isArray(attractionsData.data)) {
-                const allData = attractionsData.data as any as Attraction[];
+                let allData = attractionsData.data as any as Attraction[];
+                allData = allData.map(item => {
+                    if (overrides[item.id]) {
+                        return { ...item, ...overrides[item.id] };
+                    }
+                    return item;
+                });
 
                 const uniqueCategories = new Map<number, string>();
                 allData.forEach(item => {
@@ -36,7 +42,7 @@ export const useAttractions = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [overrides]);
 
     return { attractions, loading, error, categories };
 };
