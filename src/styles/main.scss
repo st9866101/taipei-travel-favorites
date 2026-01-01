@@ -40,7 +40,7 @@ body {
   .nav-links {
     margin-top: $spacing-unit;
 
-    button {
+    a {
       background: none;
       border: 2px solid transparent;
       margin: 0 10px;
@@ -50,10 +50,11 @@ body {
       padding: 5px 15px;
       border-radius: 20px;
       transition: all 0.2s;
+      text-decoration: none;
 
       &:hover {
         color: $primary-color;
-        background-color: lighten($primary-color, 60%);
+        background-color: color.adjust($primary-color, $lightness: 60%);
       }
 
       &.active {
