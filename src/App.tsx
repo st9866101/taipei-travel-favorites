@@ -19,6 +19,36 @@ function App() {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
+  // Favorites state
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('taipei_travel_favorites');
+    if (savedFavorites) {
+      try {
+        setFavorites(JSON.parse(savedFavorites));
+      } catch (e) {
+        console.error('Failed to parse favorites', e);
+      }
+    }
+  }, []);
+
+  // Save favorites to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('taipei_travel_favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (id: number) => {
+    setFavorites(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(fid => fid !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
   // Taipei Open API usually returns 30 items per page by default, but we use 10 for local testing
   const PAGE_SIZE = 10;
 
@@ -94,7 +124,12 @@ function App() {
         <>
           <div className="attraction-list">
             {attractions.map(item => (
-              <AttractionCard key={item.id} data={item} />
+              <AttractionCard
+                key={item.id}
+                data={item}
+                isFavorite={favorites.includes(item.id)}
+                onToggleFavorite={toggleFavorite}
+              />
             ))}
           </div>
 

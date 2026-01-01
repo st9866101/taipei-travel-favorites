@@ -185,3 +185,15 @@ body {
 .error {
   color: $accent-color;
 }
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.w-100 {
+  width: 100%;
+}
